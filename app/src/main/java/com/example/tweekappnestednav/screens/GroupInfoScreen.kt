@@ -1,5 +1,6 @@
 package com.example.tweekappnestednav.screens
 
+import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -17,12 +18,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,65 +37,51 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
+import androidx.navigation.compose.rememberNavController
 import com.example.tweekappnestednav.R
-import com.example.tweekappnestednav.shared.DefaultButton
-import com.example.tweekappnestednav.shared.PlayerScoreCard
-import com.example.tweekappnestednav.shared.SessionHistoryCard
+import com.example.tweekappnestednav.shared.PlayerInfoCard
 import com.example.tweekappnestednav.ui.theme.Orange
-import com.example.tweekappnestednav.ui.theme.TextGrey
 import com.example.tweekappnestednav.ui.theme.TweekAppNestedNavTheme
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomeScreen(
-    navigateToSessionInfoScreen: (Any?) -> Unit,
+fun GroupInfoScreen(
+    navigateToRequestsScreen: () -> Unit
 ) {
+    val navController = rememberNavController()
+    val context = LocalContext.current
+
     var textFieldSearch by remember{
         mutableStateOf("")
     }
-    val context = LocalContext.current
-
-    var batting = remember { mutableStateOf(0) }
-
-    var bowlColor = remember { mutableStateOf( Orange) }
-    var batColor = remember { mutableStateOf( TextGrey) }
 
     val constraints = ConstraintSet{
         val heading = createRefFor("heading")
-        val bowling = createRefFor("bowling")
-        val score = createRefFor("score")
+        val search = createRefFor("search")
         val list = createRefFor("list")
-        val button = createRefFor("button")
+        val fab = createRefFor("fab")
 
         constrain(heading){
             top.linkTo(parent.top)
             start.linkTo(parent.start)
-            bottom.linkTo(bowling.top)
+            bottom.linkTo(search.top)
             width = Dimension.matchParent
             height = Dimension.wrapContent
         }
-        constrain(bowling){
+        constrain(search){
             top.linkTo(heading.bottom)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-            bottom.linkTo(score.top)
-            width = Dimension.matchParent
-            height = Dimension.wrapContent
-        }
-        constrain(score){
-            top.linkTo(bowling.bottom)
             start.linkTo(parent.start)
             end.linkTo(parent.end)
             bottom.linkTo(list.top)
@@ -99,15 +89,14 @@ fun HomeScreen(
             height = Dimension.wrapContent
         }
         constrain(list){
-            top.linkTo(score.bottom)
+            top.linkTo(search.bottom)
             start.linkTo(parent.start)
             end.linkTo(parent.end)
             bottom.linkTo(parent.bottom)
-            width = Dimension.wrapContent
+            width = Dimension.matchParent
             height = Dimension.fillToConstraints
         }
-        constrain(button){
-            start.linkTo(parent.start)
+        constrain(fab){
             end.linkTo(parent.end)
             bottom.linkTo(parent.bottom)
             width = Dimension.wrapContent
@@ -119,63 +108,45 @@ fun HomeScreen(
     ConstraintLayout(constraints, modifier = Modifier
         .fillMaxSize()
         .background(Color.White)
-    ) {
-        Row(
-            modifier = Modifier
-                .layoutId("heading")
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Image(
-                painter = painterResource(id = R.drawable.back_arrow),
-                contentDescription = null,
-                alignment = Alignment.CenterStart,
-            )
-
-            Spacer(modifier = Modifier.size(10.dp))
-
-            MultiStyleText("Anant ", Color.Black, "Sharma", Orange, 24.sp)
-
-        }
-
         Row(modifier = Modifier
-            .layoutId("bowling")
+            .layoutId("heading")
             .padding(20.dp),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically){
+            horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically){
 
-            Text(
-                text = "Bowling",
-                fontSize = 16.sp,
-                color = bowlColor.value,
-                modifier = Modifier
-                    .clickable(onClick = {
-                        batting.value = 0
-                        bowlColor.value = Orange
-                        batColor.value = TextGrey
-                    })
-                    )
+            Row(
+                modifier = Modifier,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Image(
+                    painter = painterResource(id = R.drawable.back_arrow),
+                    contentDescription = null,
+                    alignment = Alignment.CenterStart,
+                )
 
-            Spacer(modifier = Modifier.size(10.dp))
+                Spacer(modifier = Modifier.size(10.dp))
 
-            Text(
-                text = "Batting",
-                fontSize = 16.sp,
-                color = batColor.value,
-                modifier = Modifier.clickable(onClick = {
-                    batting.value = 1
-                    bowlColor.value = TextGrey
-                    batColor.value = Orange
-                } ))
+                MultiStyleText("Group ", Color.Black, "Name", Orange, 24.sp)
+            }
 
+
+            Text(text = "Requests", fontSize = 10.sp, color = Orange, textAlign = TextAlign.End, modifier = Modifier.clickable(onClick = navigateToRequestsScreen))
         }
 
         Box(modifier = Modifier
-            .layoutId("score")){
+            .layoutId("search")){
 
-            PlayerScoreCard()
-
+            TextField(value = textFieldSearch,
+                label ={
+                    Text(text = "Search")
+                },
+                onValueChange = {textFieldSearch =it},
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(30.dp))
         }
 
         Column(modifier = Modifier
@@ -192,41 +163,34 @@ fun HomeScreen(
             .layoutId("list")
             .clip(shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))){
 
-            Text(text = "Session History", fontSize = 30.sp, color = Color.Black)
-
+            Text(text = "10 Members", fontSize = 20.sp, color = Color.Black)
 
             LazyColumn() {
-
-                items((1..10).toMutableList()){
-
-                    if (batting.value == 0){
-                        SessionHistoryCard(R.drawable.bowling,"6 Balls",onClick = { navigateToSessionInfoScreen(batting.value) })
-                        Divider(color = Black, thickness = 0.5.dp)
-
-                    }else if(batting.value == 1){
-                        SessionHistoryCard(R.drawable.batting,"6 Shots",onClick = {navigateToSessionInfoScreen(batting.value) })
-                        Divider(color = Black, thickness = 0.5.dp)
-                    }
-
+                items((1..10).toList()){
+                    PlayerInfoCard()
                 }
             }
         }
 
-        Box(
+        FloatingActionButton(
             modifier = Modifier
-                .layoutId("button")
-                .fillMaxWidth()
-                .padding(10.dp),
-            contentAlignment = Alignment.Center
-        ){
-
-            DefaultButton(text = "Start Bowling", onClick = { } )
-
+                .layoutId("fab")
+                .padding(20.dp),
+            onClick = {
+                //OnClick Method
+            },
+            containerColor = Orange,
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Share,
+                contentDescription = "Add FAB",
+                tint = Color.White,
+            )
         }
 
     }
 }
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
@@ -237,8 +201,9 @@ private fun DefaultPreview() {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            HomeScreen {}
-
+            GroupInfoScreen(
+                navigateToRequestsScreen = {},
+            )
         }
     }
 }

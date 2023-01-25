@@ -2,18 +2,15 @@ package com.example.tweekappnestednav.graphs
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.example.tweekappnestednav.BottomNavItem
 import com.example.tweekappnestednav.screens.DobScreen
 import com.example.tweekappnestednav.screens.EnterNameScreen
 import com.example.tweekappnestednav.screens.GenderScreen
 import com.example.tweekappnestednav.screens.HandednessScreen
 import com.example.tweekappnestednav.screens.HeightScreen
-import com.example.tweekappnestednav.screens.HomeScreen
 import com.example.tweekappnestednav.screens.ProfilePicCoachScreen
 import com.example.tweekappnestednav.screens.WeightScreen
 
@@ -36,7 +33,7 @@ fun NavGraphBuilder.playerDetailsNavGraph(navController: NavHostController) {
 
             addHandednessScreen(navController, this)
 
-            addProfilePicScreen(navController, this)
+//            addProfilePicScreen(navController, this)
 
     }
 }
@@ -74,7 +71,6 @@ private fun addDobScreen(
                 navController.navigate(PlayerDetails.GenderScreen.route)
             },
             popBackStack = { navController.popBackStack() },
-            popUpToLogin = { com.example.tweekappnestednav.graphs.popUpToLogin(navController) }
         )
     }
 }
@@ -93,7 +89,7 @@ private fun addGenderScreen(
                 navController.navigate(PlayerDetails.WeightScreen.route)
             },
             popBackStack = { navController.popBackStack() },
-            popUpToLogin = { com.example.tweekappnestednav.graphs.popUpToLogin(navController) }
+
         )
     }
 }
@@ -112,7 +108,6 @@ private fun addWeightScreen(
                 navController.navigate(PlayerDetails.HeightScreen.route)
             },
             popBackStack = { navController.popBackStack() },
-            popUpToLogin = { com.example.tweekappnestednav.graphs.popUpToLogin(navController) }
         )
     }
 }
@@ -131,7 +126,6 @@ private fun addHeightScreen(
                 navController.navigate(PlayerDetails.HandednessScreen.route)
             },
             popBackStack = { navController.popBackStack() },
-            popUpToLogin = { com.example.tweekappnestednav.graphs.popUpToLogin(navController) }
         )
     }
 }
@@ -146,34 +140,33 @@ private fun addHandednessScreen(
         val args = navBackStackEntry.arguments
 
         HandednessScreen(
-            navigateToProfilePicScreen = {
-                navController.navigate(PlayerDetails.ProfilePic.route)
-            },
-            popBackStack = { navController.popBackStack() },
-            popUpToLogin = { com.example.tweekappnestednav.graphs.popUpToLogin(navController) }
-        )
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-private fun addProfilePicScreen(
-    navController: NavHostController,
-    navGraphBuilder: NavGraphBuilder
-) {
-    navGraphBuilder.composable(route = PlayerDetails.ProfilePic.route)
-    { navBackStackEntry ->
-
-        val args = navBackStackEntry.arguments
-
-        ProfilePicCoachScreen(
             navigateToHomeScreen = {
-                navController.navigate(Graph.HOME)
+                navController.navigate(Graph.BOTTOM_NAV)
             },
             popBackStack = { navController.popBackStack() },
-            popUpToLogin = { com.example.tweekappnestednav.graphs.popUpToLogin(navController) }
         )
     }
 }
+
+//@RequiresApi(Build.VERSION_CODES.O)
+//private fun addProfilePicScreen(
+//    navController: NavHostController,
+//    navGraphBuilder: NavGraphBuilder
+//) {
+//    navGraphBuilder.composable(route = PlayerDetails.ProfilePic.route)
+//    { navBackStackEntry ->
+//
+//        val args = navBackStackEntry.arguments
+//
+//        ProfilePicCoachScreen(
+//            navigateToHomeScreen = {
+//                navController.navigate(Graph.BOTTOM_NAV)
+//            },
+//            popBackStack = { navController.popBackStack() },
+//            popUpToLogin = { com.example.tweekappnestednav.graphs.popUpToLogin(navController) }
+//        )
+//    }
+//}
 
 
 
@@ -191,6 +184,6 @@ sealed class PlayerDetails(val route: String) {
 
     object HandednessScreen: PlayerDetails("handedness_screen")
 
-    object ProfilePic: PlayerDetails("profile_pic")
+//    object ProfilePic: PlayerDetails("profile_pic")
 }
 

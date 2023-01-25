@@ -2,13 +2,10 @@ package com.example.tweekappnestednav.graphs
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.example.tweekappnestednav.BottomNavItem
-import com.example.tweekappnestednav.navigation.NavRoute
 import com.example.tweekappnestednav.screens.LoginScreen
 import com.example.tweekappnestednav.screens.OtpScreen
 
@@ -20,7 +17,6 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
     ) {
         addLoginScreen(navController, this)
         addOtpScreen(navController, this)
-//        playerDetailsNavGraph(navController = navController)
     }
 }
 

@@ -71,7 +71,7 @@ fun ExpandableFAB(
                 false
             }
             .alpha(0.8f)
-            .background(Color.Black)
+            .background(White)
             .fillMaxSize())
     }
 

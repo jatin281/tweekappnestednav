@@ -4,7 +4,6 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,9 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,55 +40,44 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.tweekappnestednav.R
-import com.example.tweekappnestednav.shared.DefaultButton
+import com.example.tweekappnestednav.shared.PerformanceCard
+import com.example.tweekappnestednav.shared.PlayerInfoCard
 import com.example.tweekappnestednav.shared.PlayerScoreCard
 import com.example.tweekappnestednav.shared.SessionHistoryCard
+import com.example.tweekappnestednav.shared.SessionSummaryCard
 import com.example.tweekappnestednav.ui.theme.Orange
-import com.example.tweekappnestednav.ui.theme.TextGrey
 import com.example.tweekappnestednav.ui.theme.TweekAppNestedNavTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(
-    navigateToSessionInfoScreen: (Any?) -> Unit,
+fun SessionInfoScreen(
+    id: Int,
+    navigateToSessionSummaryScreen: () -> Unit,
+    navigateToAnalyticsBowlingScreen: () -> Unit
 ) {
     var textFieldSearch by remember{
         mutableStateOf("")
     }
-    val context = LocalContext.current
-
-    var batting = remember { mutableStateOf(0) }
-
-    var bowlColor = remember { mutableStateOf( Orange) }
-    var batColor = remember { mutableStateOf( TextGrey) }
 
     val constraints = ConstraintSet{
         val heading = createRefFor("heading")
-        val bowling = createRefFor("bowling")
-        val score = createRefFor("score")
+        val summary = createRefFor("summary")
         val list = createRefFor("list")
-        val button = createRefFor("button")
 
         constrain(heading){
             top.linkTo(parent.top)
             start.linkTo(parent.start)
-            bottom.linkTo(bowling.top)
+            bottom.linkTo(summary.top)
             width = Dimension.matchParent
             height = Dimension.wrapContent
         }
-        constrain(bowling){
+        constrain(summary){
             top.linkTo(heading.bottom)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-            bottom.linkTo(score.top)
-            width = Dimension.matchParent
-            height = Dimension.wrapContent
-        }
-        constrain(score){
-            top.linkTo(bowling.bottom)
             start.linkTo(parent.start)
             end.linkTo(parent.end)
             bottom.linkTo(list.top)
@@ -99,19 +85,12 @@ fun HomeScreen(
             height = Dimension.wrapContent
         }
         constrain(list){
-            top.linkTo(score.bottom)
+            top.linkTo(summary.bottom)
             start.linkTo(parent.start)
             end.linkTo(parent.end)
             bottom.linkTo(parent.bottom)
             width = Dimension.wrapContent
             height = Dimension.fillToConstraints
-        }
-        constrain(button){
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-            bottom.linkTo(parent.bottom)
-            width = Dimension.wrapContent
-            height = Dimension.wrapContent
         }
 
     }
@@ -125,7 +104,7 @@ fun HomeScreen(
                 .layoutId("heading")
                 .padding(20.dp),
             verticalAlignment = Alignment.CenterVertically
-        ) {
+        ){
 
             Image(
                 painter = painterResource(id = R.drawable.back_arrow),
@@ -135,46 +114,14 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.size(10.dp))
 
-            MultiStyleText("Anant ", Color.Black, "Sharma", Orange, 24.sp)
-
-        }
-
-        Row(modifier = Modifier
-            .layoutId("bowling")
-            .padding(20.dp),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically){
-
-            Text(
-                text = "Bowling",
-                fontSize = 16.sp,
-                color = bowlColor.value,
-                modifier = Modifier
-                    .clickable(onClick = {
-                        batting.value = 0
-                        bowlColor.value = Orange
-                        batColor.value = TextGrey
-                    })
-                    )
-
-            Spacer(modifier = Modifier.size(10.dp))
-
-            Text(
-                text = "Batting",
-                fontSize = 16.sp,
-                color = batColor.value,
-                modifier = Modifier.clickable(onClick = {
-                    batting.value = 1
-                    bowlColor.value = TextGrey
-                    batColor.value = Orange
-                } ))
+            MultiStyleText("Session ", Color.Black, "#$id", Orange, 24.sp)
 
         }
 
         Box(modifier = Modifier
-            .layoutId("score")){
+            .layoutId("summary")){
 
-            PlayerScoreCard()
+            SessionSummaryCard(onClick = navigateToSessionSummaryScreen)
 
         }
 
@@ -192,41 +139,24 @@ fun HomeScreen(
             .layoutId("list")
             .clip(shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))){
 
-            Text(text = "Session History", fontSize = 30.sp, color = Color.Black)
-
+            Text(text = "Performance", fontSize = 30.sp, color = Color.Black)
 
             LazyColumn() {
+                items((1..10).toList()){
 
-                items((1..10).toMutableList()){
-
-                    if (batting.value == 0){
-                        SessionHistoryCard(R.drawable.bowling,"6 Balls",onClick = { navigateToSessionInfoScreen(batting.value) })
-                        Divider(color = Black, thickness = 0.5.dp)
-
-                    }else if(batting.value == 1){
-                        SessionHistoryCard(R.drawable.batting,"6 Shots",onClick = {navigateToSessionInfoScreen(batting.value) })
-                        Divider(color = Black, thickness = 0.5.dp)
+                    if (id == 0){
+                        PerformanceCard(R.drawable.ball,"Ball 5",onClick = navigateToAnalyticsBowlingScreen)
+                        Divider(color = Color.Black, thickness = 0.5.dp)
+                    }else if(id == 1){
+                        PerformanceCard(R.drawable.bat,"Shot 5",onClick = {})
+                        Divider(color = Color.Black, thickness = 0.5.dp)
                     }
 
                 }
             }
         }
-
-        Box(
-            modifier = Modifier
-                .layoutId("button")
-                .fillMaxWidth()
-                .padding(10.dp),
-            contentAlignment = Alignment.Center
-        ){
-
-            DefaultButton(text = "Start Bowling", onClick = { } )
-
-        }
-
     }
 }
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
@@ -237,7 +167,11 @@ private fun DefaultPreview() {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            HomeScreen {}
+            SessionInfoScreen(id = 2,
+                navigateToSessionSummaryScreen = {},
+                navigateToAnalyticsBowlingScreen = {}
+
+            )
 
         }
     }

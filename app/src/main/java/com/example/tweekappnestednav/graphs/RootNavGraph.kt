@@ -18,9 +18,10 @@ fun RootNavigationGraph(navController: NavHostController) {
     ) {
         authNavGraph(navController = navController)
         playerDetailsNavGraph(navController = navController)
-        composable(route = Graph.HOME) {
-            HomeScreen()
-        }
+        bottomNavGraph(navController = navController)
+        fabNavGraph(navController = navController)
+        groupNavGraph(navController = navController)
+        homeNavGraph(navController = navController)
     }
 }
 
@@ -28,6 +29,8 @@ object Graph {
     const val ROOT = "root_graph"
     const val AUTHENTICATION = "auth_graph"
     const val PLAYER_DETAILS = "player_details_graph"
-    const val HOME = "home_graph"
+    const val BOTTOM_NAV = "bottom_nav_graph"
     const val FAB = "fab_graph"
+    const val GROUP = "group_graph"
+    const val HOME = "home_graph"
 }
